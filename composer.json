@@ -22,6 +22,7 @@
     "source": "https://github.com/log-oscon/post-glue"
   },
   "require-dev": {
-    "phpunit/phpunit": "^5.2"
+    "phpunit/phpunit": "4.8.23",
+    "symfony/yaml": "~2.1"
   }
 }

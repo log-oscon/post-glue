@@ -1,5 +1,7 @@
 # Post Glue
 
+[![Latest Stable Version](https://poser.pugx.org/logoscon/post-glue/v/stable.svg)](https://packagist.org/packages/logoscon/post-glue) [![Latest Unstable Version](https://poser.pugx.org/logoscon/post-glue/v/unstable.svg)](https://packagist.org/packages/logoscon/post-glue) [![Build Status](https://travis-ci.org/log-oscon/post-glue.svg?branch=master)](https://travis-ci.org/log-oscon/post-glue) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/log-oscon/post-glue/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/log-oscon/post-glue/?branch=master)
+
 Sticky posts for WordPress, improved.
 
 This plugin addresses the following issues and limitations found in the core's implementation of sticky posts:

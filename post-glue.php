@@ -141,9 +141,9 @@ class Post_Glue {
 	/**
 	 * Saves post stickiness to the `_sticky` post meta key.
 	 *
-	 * @param  mixed  $old_value Saved post ID.
-	 * @param  mixed  $value     Saved post instance.
-	 * @param  string $option    True if updating existing post.
+	 * @param  mixed  $old_value Previous option value.
+	 * @param  mixed  $value     New option value.
+	 * @param  string $option    Option name.
 	 */
 	public static function update_option_sticky_posts( $old_value, $value, $option ) {
 		$added   = array_diff( $value, $old_value );

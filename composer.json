@@ -1,0 +1,27 @@
+{
+  "name": "logoscon/post-glue",
+  "description": "Sticky posts for WordPress, improved.",
+  "type": "wordpress-plugin",
+  "keywords": ["wordpress", "plugin", "sticky"],
+  "homepage": "https://github.com/log-oscon/post-glue",
+  "license": "GPL-2.0+",
+  "authors": [
+    {
+      "name": "Luís Rodrigues",
+      "email": "hello@goblindegook.net",
+      "homepage": "https://goblindegook.com"
+    },
+    {
+      "name": "log.OSCON, Lda.",
+      "email": "engenharia@log.pt",
+      "homepage": "https://log.pt/"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/log-oscon/post-glue/issues",
+    "source": "https://github.com/log-oscon/post-glue"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^5.2"
+  }
+}

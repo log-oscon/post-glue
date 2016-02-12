@@ -1,18 +1,43 @@
+# Numerous always-ignore extensions
+*.diff
+*.err
+*.orig
 *.log
-.htaccess
-sitemap.xml
-sitemap.xml.gz
-wp-config.php
-wp-content/advanced-cache.php
-wp-content/backup-db/
-wp-content/backups/
-wp-content/blogs.dir/
-wp-content/cache/
-wp-content/upgrade/
-wp-content/uploads/
-wp-content/wp-cache-config.php
-wp-content/plugins/hello.php
+*.rej
+*.swo
+*.swp
+*.vi
+*~
+*.sass-cache
 
-/readme.html
-/license.txt
+# OS or Editor folders
+.DS_Store
+Thumbs.db
+.cache
+.project
+.settings
+.tmproj
+*.esproj
+nbproject
+*.sublime-project
+*.sublime-workspace
 
+# Dreamweaver added files
+_notes
+dwsync.xml
+
+# Komodo
+*.komodoproject
+.komodotools
+
+# Package management
+node_modules/
+vendor/
+
+# Folders to ignore
+.hg
+.svn
+.CVS
+intermediate
+.idea
+cache

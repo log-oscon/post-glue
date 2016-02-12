@@ -184,12 +184,12 @@ class Post_Glue {
 		}
 
 		// Ignore queries that already provide an order:
-		if ( ! empty( $query->get( 'orderby' ) ) ) {
+		if ( $query->get( 'orderby' ) ) {
 			return;
 		}
 
 		// Ignore queries that already provide a meta query:
-		if ( ! empty( $query->get( 'meta_query' ) ) ) {
+		if ( $query->get( 'meta_query' ) ) {
 			return;
 		}
 

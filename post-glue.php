@@ -69,7 +69,7 @@ class Post_Glue {
 
 		add_meta_box(
 			'post_glue_meta',
-			__( 'Post Glue', 'post_glue' ),
+			__( 'Post Glue', 'post-glue' ),
 			array( __CLASS__, 'admin_meta_box' ),
 			$post_types,
 			'side',

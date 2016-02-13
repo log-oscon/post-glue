@@ -30,6 +30,22 @@ module.exports = function (grunt) {
 
     pkg: pkg,
 
+    exec: {
+      'install-wp-tests': {
+        cmd: './bin/install-wp-tests.sh wordpress_unit_tests external external 192.168.50.4',
+        exitCode: [0, 255]
+      }
+    },
+
+    phpunit: {
+      tests: {
+        dir: 'tests/test-*.php'
+      },
+      options: {
+        bin: 'vendor/bin/phpunit',
+      }
+    },
+
     checktextdomain: {
       options: {
         text_domain:    '<%= pkg.name %>',
@@ -145,6 +161,12 @@ module.exports = function (grunt) {
   require('load-grunt-tasks')(grunt);
 
   // Register tasks
+  grunt.registerTask('test', [
+    'composer:install',
+    'exec:install-wp-tests',
+    'phpunit',
+  ]);
+
   grunt.registerTask('pot', [
     'checktextdomain',
     'makepot',

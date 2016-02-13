@@ -9,20 +9,20 @@ module.exports = function (grunt) {
     '!assets/**',
     '!bin/**',
     '!build/**',
+    '!node_modules/**',
+    '!svn/**',
+    '!tests/**',
+    '!vendor/**',
     '!bootstrap.php',
     '!CHANGELOG.md',
     '!composer.json',
     '!composer.lock',
     '!Gruntfile.js',
-    '!node_modules/**',
     '!package.json',
     '!phpdoc.dist.xml',
     '!phpunit.xml',
     '!phpunit.xml.dist',
     '!README.md',
-    '!svn/**',
-    '!tests/**',
-    '!vendor/**',
   ];
 
   // Project configuration
@@ -32,7 +32,7 @@ module.exports = function (grunt) {
 
     checktextdomain: {
       options: {
-        text_domain:    'post-glue',
+        text_domain:    '<%= pkg.name %>',
         correct_domain: false,
         keywords:       [
           '__:1,2d',
@@ -58,7 +58,7 @@ module.exports = function (grunt) {
       files: {
         src: [
           'uninstall.php',
-          'post-glue.php',
+          '<%= pkg.name %>.php',
         ],
         expand: true
       }
@@ -69,8 +69,8 @@ module.exports = function (grunt) {
         options: {
           cwd:         '',
           domainPath:  '/languages',
-          potFilename: 'post-glue.pot',
-          mainFile:    'post-glue.php',
+          potFilename: '<%= pkg.name %>.pot',
+          mainFile:    '<%= pkg.name %>.php',
           include:     [],
           exclude:     [
             'assets/',
@@ -89,7 +89,7 @@ module.exports = function (grunt) {
             poedit:                  true,
             'x-poedit-keywordslist': true,
             'language':              'en_US',
-            'report-msgid-bugs-to':  'https://github.com/goblindegook/post-glue',
+            'report-msgid-bugs-to':  'https://github.com/goblindegook/<%= pkg.name %>',
             'last-translator':       'Luís Rodrigues <hello@goblindegook.net>',
             'language-Team':         'Luís Rodrigues <hello@goblindegook.net>'
           },
@@ -112,7 +112,7 @@ module.exports = function (grunt) {
       main: {
         expand: true,
         src:    distFiles,
-        dest:   'build/post-glue'
+        dest:   'build/<%= pkg.name %>'
       }
     },
 
@@ -120,21 +120,21 @@ module.exports = function (grunt) {
       main: {
         options: {
           mode:    'zip',
-          archive: './build/post-glue-<%= pkg.version %>.zip'
+          archive: './build/<%= pkg.name %>-<%= pkg.version %>.zip'
         },
         expand: true,
         src:    distFiles,
-        dest:   '/post-glue/'
+        dest:   '/<%= pkg.name %>/'
       }
     },
 
     wp_deploy: {
       deploy: {
         options: {
-          plugin_slug: 'post-glue',
-          build_dir:   'build/post-glue',
+          plugin_slug: '<%= pkg.name %>',
+          build_dir:   'build/<%= pkg.name %>',
           assets_dir:  'assets',
-          svn_url:     'https://plugins.svn.wordpress.org/post-glue'
+          svn_url:     'https://plugins.svn.wordpress.org/<%= pkg.name %>'
         }
       }
     }

@@ -86,6 +86,8 @@ class Test_PostGlue extends WP_UnitTestCase {
 	 * @covers ::admin_init
 	 */
 	function test_admin_init() {
+		global $wp_meta_boxes;
+
 		$post_types = get_post_types( array( 'hierarchical' => false, 'public' => true ) );
 
 		foreach ( $post_types as $post_type ) {
@@ -93,6 +95,9 @@ class Test_PostGlue extends WP_UnitTestCase {
 				has_filter( 'views_edit-' . $post_type, array( 'Post_Glue', 'views_edit' ) ), false,
 				"views_edit-{$post_type}' not hooked before 'admin_init'."
 			);
+
+			$this->assertTrue( empty( $wp_meta_boxes[ $post_type ]['side']['high']['post_glue_meta'] ),
+			 	"Meta box for post type '{$post_type}' not registered before 'admin_init'." );
 		}
 
 		Post_Glue::admin_init();
@@ -104,11 +109,10 @@ class Test_PostGlue extends WP_UnitTestCase {
 				has_filter( 'views_edit-' . $post_type, array( 'Post_Glue', 'views_edit' ) ), $expected,
 		 		"Add 'views_edit-{$post_type}' filter with priority {$expected} on 'admin_init'."
 			);
+
+			$this->assertEquals( ! empty( $wp_meta_boxes[ $post_type ]['side']['high']['post_glue_meta'] ), (bool) $expected,
+			 	"Meta box for post type '{$post_type}' not registered before 'admin_init'." );
 		}
-
-		// TODO: Test meta box.
-
-		$this->markTestIncomplete();
 	}
 
 	/**
@@ -116,6 +120,9 @@ class Test_PostGlue extends WP_UnitTestCase {
 	 * @covers ::admin_init
 	 */
 	function test_post_glue_post_types() {
+		$action = new MockAction();
+
+		add_filter( 'post_glue_post_types', array( &$action, 'filter' ) );
 		add_filter( 'post_glue_post_types', array( __CLASS__, 'post_glue_post_types' ) );
 
 		Post_Glue::admin_init();
@@ -124,6 +131,9 @@ class Test_PostGlue extends WP_UnitTestCase {
 			has_filter( 'views_edit-unicorns', array( 'Post_Glue', 'views_edit' ) ), 10,
 			"The 'post_glue_post_types' filter allows modifying the supported post type list."
 		);
+
+		$this->assertEquals( $action->get_call_count(), 1,
+	 		"The 'post_glue_post_types' filter is called once on init." );
 	}
 
 	/**
@@ -141,7 +151,28 @@ class Test_PostGlue extends WP_UnitTestCase {
 	 * @covers ::admin_meta_box
 	 */
 	function test_admin_meta_box() {
-		$this->markTestIncomplete();
+		global $post;
+
+		$post_id = $this->factory->post->create();
+		$post    = get_post( $post_id );
+
+		unstick_post( $post_id );
+
+		ob_start();
+		Post_Glue::admin_meta_box();
+		$meta_box = ob_get_clean();
+
+		$this->assertNotRegExp( '/checked/', $meta_box,
+			'Sticky metabox is unchecked.' );
+
+		stick_post( $post_id );
+
+		ob_start();
+		Post_Glue::admin_meta_box();
+		$meta_box = ob_get_clean();
+
+		$this->assertRegExp( '/checked/', $meta_box,
+			'Sticky metabox is checked.' );
 	}
 
 	/**
@@ -149,7 +180,28 @@ class Test_PostGlue extends WP_UnitTestCase {
 	 * @covers ::views_edit
 	 */
 	function test_views_edit() {
-		$this->markTestIncomplete();
+		global $wp_query;
+
+		$wp_query = new WP_Query( 'post_type=post' );
+		$post_ids = $this->factory->post->create_many( 10 );
+		$expected = 0;
+
+		$views = Post_Glue::views_edit( array() );
+
+		$this->assertTrue( empty( $views['sticky'] ),
+	 		'No sticky posts view.' );
+
+		foreach ( $post_ids as $post_id ) {
+			if ( $post_id % 2 ) {
+				stick_post( $post_id );
+				$expected++;
+			}
+		}
+
+		$views = Post_Glue::views_edit( array() );
+
+		$this->assertRegExp( '/\(' . $expected . '\)/', $views['sticky'],
+			"View link indicates {$expected} posts." );
 	}
 
 	/**
@@ -159,7 +211,34 @@ class Test_PostGlue extends WP_UnitTestCase {
 	 * @covers ::unstick_posts
 	 */
 	function test_update_option_sticky_posts() {
-		$this->markTestIncomplete();
+		$post_ids   = $this->factory->post->create_many( 10 );
+		$sticky_ids = array();
+
+		foreach ( $post_ids as $post_id ) {
+			if ( $post_id % 2 ) {
+				$sticky_ids[] = $post_id;
+			}
+		}
+
+		Post_Glue::update_option_sticky_posts( array(), $sticky_ids, 'sticky_posts' );
+
+		foreach ( $post_ids as $post_id ) {
+			$actual   = get_post_meta( $post_id, '_sticky', true );
+			$expected = in_array( $post_id, $sticky_ids ) ? '1' : '';
+
+			$this->assertEquals( $actual, $expected,
+		 		'A `_sticky` meta value of 1 is set on sticky posts.' );
+		}
+
+		Post_Glue::update_option_sticky_posts( $sticky_ids, array(), 'sticky_posts' );
+
+		foreach ( $post_ids as $post_id ) {
+			$actual   = get_post_meta( $post_id, '_sticky', true );
+			$expected = '';
+
+			$this->assertEquals( $actual, $expected,
+		 		'Removing sticky_posts option clears `_sticky` meta value.' );
+		}
 	}
 
 	/**
@@ -175,7 +254,22 @@ class Test_PostGlue extends WP_UnitTestCase {
 	 * @covers ::pre_get_posts
 	 */
 	function test_post_class() {
-		$this->markTestIncomplete();
+		global $wp_query;
+
+		$post_id  = $this->factory->post->create();
+		$wp_query = new WP_Query( 'post_type=post' );
+
+		$classes = Post_Glue::post_class( array(), '', $post_id );
+
+		$this->assertEmpty( $classes,
+	 		"Regular post in loop is given a 'sticky' class." );
+
+		stick_post( $post_id );
+
+		$classes = Post_Glue::post_class( array(), '', $post_id );
+
+		$this->assertContains( 'sticky', $classes,
+	 		"Sticky post in loop is given a 'sticky' class." );
 	}
 
 }

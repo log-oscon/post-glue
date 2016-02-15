@@ -27,6 +27,14 @@ class Test_PostGlue extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test the activation callback.
+	 * @covers ::activation
+	 */
+	function test_activation() {
+		$this->markTestIncomplete();
+	}
+
+	/**
 	 * Test plugin action callbacks.
 	 * @group action
 	 * @covers ::plugins_loaded
@@ -37,7 +45,7 @@ class Test_PostGlue extends WP_UnitTestCase {
 				'callback' => array( 'Post_Glue', 'plugins_loaded' ),
 				'priority' => 10,
 			),
-			'admin_init'                 => array(
+			'admin_init' => array(
 				'callback' => array( 'Post_Glue', 'admin_init' ),
 				'priority' => 10,
 			),
@@ -45,7 +53,7 @@ class Test_PostGlue extends WP_UnitTestCase {
 				'callback' => array( 'Post_Glue', 'update_option_sticky_posts' ),
 				'priority' => 10,
 			),
-			'pre_get_posts'              => array(
+			'pre_get_posts' => array(
 				'callback' => array( 'Post_Glue', 'pre_get_posts' ),
 				'priority' => 10,
 			),

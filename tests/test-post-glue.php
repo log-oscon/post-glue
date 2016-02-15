@@ -42,6 +42,13 @@ class Test_PostGlue extends WP_UnitTestCase {
 			}
 		}
 
+		foreach ( $post_ids as $post_id ) {
+			$actual   = get_post_meta( $post_id, '_sticky', true );
+			
+			$this->assertEquals( '', $actual,
+		 		'The `_sticky` meta value is empty before activation.' );
+		}
+
 		Post_Glue::activation();
 
 		foreach ( $post_ids as $post_id ) {

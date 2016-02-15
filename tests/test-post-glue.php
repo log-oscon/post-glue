@@ -31,7 +31,26 @@ class Test_PostGlue extends WP_UnitTestCase {
 	 * @covers ::activation
 	 */
 	function test_activation() {
-		$this->markTestIncomplete();
+		$post_ids   = $this->factory->post->create_many( 10 );
+		$sticky_ids = array();
+
+		foreach ( $post_ids as $post_id ) {
+			if ( $post_id % 2 ) {
+				stick_post( $post_id );
+				delete_post_meta( $post_id, '_sticky' );
+				$sticky_ids[] = $post_id;
+			}
+		}
+
+		Post_Glue::activation();
+
+		foreach ( $post_ids as $post_id ) {
+			$actual   = get_post_meta( $post_id, '_sticky', true );
+			$expected = in_array( $post_id, $sticky_ids ) ? '1' : '';
+
+			$this->assertEquals( $expected, $actual,
+		 		'A `_sticky` meta value of 1 is set on sticky posts on activation.' );
+		}
 	}
 
 	/**
@@ -266,7 +285,7 @@ class Test_PostGlue extends WP_UnitTestCase {
 		$wp_query = new WP_Query( 'p=1' );
 
 		Post_Glue::pre_get_posts( $wp_query );
-		
+
 		$this->assertEmpty( $wp_query->get( 'orderby' ),
 			'Do not change the query instance when getting a single post.' );
 

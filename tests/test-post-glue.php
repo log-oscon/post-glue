@@ -68,14 +68,14 @@ class Test_PostGlue extends WP_UnitTestCase {
 
 		foreach ( $actions as $name => $action ) {
 			$this->assertEquals(
-				has_action( $name, $action['callback'] ), $action['priority'],
+				$action['priority'], has_action( $name, $action['callback'] ),
 			 	"Add '{$name}' action with priority {$action['priority']} on load."
 			);
 		}
 
 		foreach ( $filters as $name => $filter ) {
 			$this->assertEquals(
-				has_filter( $name, $filter['callback'] ), $filter['priority'],
+				$filter['priority'], has_filter( $name, $filter['callback'] ),
 			 	"Add '{$name}' filter with priority {$action['priority']} on load."
 			);
 		}
@@ -106,11 +106,12 @@ class Test_PostGlue extends WP_UnitTestCase {
 			$expected = $post_type === 'post' ? false : 10;
 
 			$this->assertEquals(
-				has_filter( 'views_edit-' . $post_type, array( 'Post_Glue', 'views_edit' ) ), $expected,
+				$expected, has_filter( 'views_edit-' . $post_type, array( 'Post_Glue', 'views_edit' ) ),
 		 		"Add 'views_edit-{$post_type}' filter with priority {$expected} on 'admin_init'."
 			);
 
-			$this->assertEquals( ! empty( $wp_meta_boxes[ $post_type ]['side']['high']['post_glue_meta'] ), (bool) $expected,
+			$this->assertEquals(
+				(bool) $expected, ! empty( $wp_meta_boxes[ $post_type ]['side']['high']['post_glue_meta'] ),
 			 	"Meta box for post type '{$post_type}' not registered before 'admin_init'." );
 		}
 	}
@@ -128,11 +129,11 @@ class Test_PostGlue extends WP_UnitTestCase {
 		Post_Glue::admin_init();
 
 		$this->assertEquals(
-			has_filter( 'views_edit-unicorns', array( 'Post_Glue', 'views_edit' ) ), 10,
+			10, has_filter( 'views_edit-unicorns', array( 'Post_Glue', 'views_edit' ) ),
 			"The 'post_glue_post_types' filter allows modifying the supported post type list."
 		);
 
-		$this->assertEquals( $action->get_call_count(), 1,
+		$this->assertEquals( 1, $action->get_call_count(),
 	 		"The 'post_glue_post_types' filter is called once on init." );
 	}
 
@@ -226,7 +227,7 @@ class Test_PostGlue extends WP_UnitTestCase {
 			$actual   = get_post_meta( $post_id, '_sticky', true );
 			$expected = in_array( $post_id, $sticky_ids ) ? '1' : '';
 
-			$this->assertEquals( $actual, $expected,
+			$this->assertEquals( $expected, $actual,
 		 		'A `_sticky` meta value of 1 is set on sticky posts.' );
 		}
 
@@ -236,7 +237,7 @@ class Test_PostGlue extends WP_UnitTestCase {
 			$actual   = get_post_meta( $post_id, '_sticky', true );
 			$expected = '';
 
-			$this->assertEquals( $actual, $expected,
+			$this->assertEquals( $expected, $actual,
 		 		'Removing sticky_posts option clears `_sticky` meta value.' );
 		}
 	}
@@ -246,7 +247,42 @@ class Test_PostGlue extends WP_UnitTestCase {
 	 * @covers ::pre_get_posts
 	 */
 	function test_pre_get_posts() {
-		$this->markTestIncomplete();
+		$wp_query = new WP_Query( 'post_type=post' );
+
+		Post_Glue::pre_get_posts( $wp_query );
+
+		$this->assertEquals( 1, $wp_query->get( 'ignore_sticky_posts' ),
+	 		'Ignore stickiness when sorting posts by post meta.' );
+
+		$this->assertNotEmpty( $wp_query->get( 'meta_query' ),
+			'Change the query instance to set post meta clause for sorting.' );
+
+		$this->assertArrayHasKey( 'sticky_clause', $wp_query->get( 'orderby' ),
+			'Change the query instance to sort by post meta.' );
+
+		$this->assertArrayHasKey( 'date', $wp_query->get( 'orderby' ),
+			'Change the query instance to sort by date as a secondary criterium.' );
+
+		$wp_query = new WP_Query( 'p=1' );
+
+		Post_Glue::pre_get_posts( $wp_query );
+		
+		$this->assertEmpty( $wp_query->get( 'orderby' ),
+			'Do not change the query instance when getting a single post.' );
+
+		$wp_query = new WP_Query( array( 'post__in' => array( 1, 2, 3 ) ) );
+
+		Post_Glue::pre_get_posts( $wp_query );
+
+		$this->assertEmpty( $wp_query->get( 'orderby' ),
+			'Do not change the query instance when querying specific posts.' );
+
+		$wp_query = new WP_Query( 'post_type=post&ignore_sticky_posts=1' );
+
+		Post_Glue::pre_get_posts( $wp_query );
+
+		$this->assertEmpty( $wp_query->get( 'orderby' ),
+			'Do not change the query instance when ignoring sticky posts.' );
 	}
 
 	/**

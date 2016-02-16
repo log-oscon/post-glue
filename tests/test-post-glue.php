@@ -44,7 +44,7 @@ class Test_PostGlue extends WP_UnitTestCase {
 
 		foreach ( $post_ids as $post_id ) {
 			$actual   = get_post_meta( $post_id, '_sticky', true );
-			
+
 			$this->assertEquals( '', $actual,
 		 		'The `_sticky` meta value is empty before activation.' );
 		}
@@ -254,7 +254,7 @@ class Test_PostGlue extends WP_UnitTestCase {
 			$expected = in_array( $post_id, $sticky_ids ) ? '1' : '';
 
 			$this->assertEquals( $expected, $actual,
-		 		'A `_sticky` meta value of 1 is set on sticky posts.' );
+		 		'Set a `_sticky` meta value of 1 on sticky posts.' );
 		}
 
 		Post_Glue::update_option_sticky_posts( $sticky_ids, array(), 'sticky_posts' );
@@ -273,6 +273,8 @@ class Test_PostGlue extends WP_UnitTestCase {
 	 * @covers ::pre_get_posts
 	 */
 	function test_pre_get_posts() {
+		// post_type
+
 		$wp_query = new WP_Query( 'post_type=post' );
 
 		Post_Glue::pre_get_posts( $wp_query );
@@ -289,6 +291,8 @@ class Test_PostGlue extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'date', $wp_query->get( 'orderby' ),
 			'Change the query instance to sort by date as a secondary criterium.' );
 
+		// p
+
 		$wp_query = new WP_Query( 'p=1' );
 
 		Post_Glue::pre_get_posts( $wp_query );
@@ -296,12 +300,16 @@ class Test_PostGlue extends WP_UnitTestCase {
 		$this->assertEmpty( $wp_query->get( 'orderby' ),
 			'Do not change the query instance when getting a single post.' );
 
+		// post__in
+
 		$wp_query = new WP_Query( array( 'post__in' => array( 1, 2, 3 ) ) );
 
 		Post_Glue::pre_get_posts( $wp_query );
 
 		$this->assertEmpty( $wp_query->get( 'orderby' ),
 			'Do not change the query instance when querying specific posts.' );
+
+		// ignore_sticky_posts
 
 		$wp_query = new WP_Query( 'post_type=post&ignore_sticky_posts=1' );
 
@@ -313,7 +321,7 @@ class Test_PostGlue extends WP_UnitTestCase {
 
 	/**
 	 * Test the post_class filter callback.
-	 * @covers ::pre_get_posts
+	 * @covers ::post_class
 	 */
 	function test_post_class() {
 		global $wp_query;
@@ -324,7 +332,7 @@ class Test_PostGlue extends WP_UnitTestCase {
 		$classes = Post_Glue::post_class( array(), '', $post_id );
 
 		$this->assertEmpty( $classes,
-	 		"Regular post in loop is given a 'sticky' class." );
+	 		"Regular post in loop is not given a class." );
 
 		stick_post( $post_id );
 

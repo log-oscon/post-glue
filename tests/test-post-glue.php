@@ -62,7 +62,6 @@ class Test_PostGlue extends WP_UnitTestCase {
 
 	/**
 	 * Test plugin action callbacks.
-	 * @group action
 	 * @covers ::plugins_loaded
 	 */
 	function test_plugins_loaded() {
@@ -91,6 +90,8 @@ class Test_PostGlue extends WP_UnitTestCase {
 				'priority' => 10,
 			),
 		);
+
+		Post_Glue::plugins_loaded();
 
 		foreach ( $actions as $name => $action ) {
 			$this->assertEquals(
@@ -317,6 +318,40 @@ class Test_PostGlue extends WP_UnitTestCase {
 
 		$this->assertEmpty( $wp_query->get( 'orderby' ),
 			'Do not change the query instance when ignoring sticky posts.' );
+
+		// orderby
+
+		$wp_query = new WP_Query( 'orderby=unicorns' );
+
+		Post_Glue::pre_get_posts( $wp_query );
+
+		$this->assertEquals( 'unicorns', $wp_query->get( 'orderby' ),
+			'Do not change the query instance when custom sorting.' );
+
+		// meta_query
+
+		$wp_query = new WP_Query( 'meta_query=unicorns' );
+
+		Post_Glue::pre_get_posts( $wp_query );
+
+		$this->assertEquals( 'unicorns', $wp_query->get( 'meta_query' ),
+			'Do not change the query instance when custom sorting.' );
+	}
+
+	/**
+	 * Test the query preprocessor.
+	 * @runInSeparateProcess
+	 * @covers ::pre_get_posts
+	 */
+	function test_pre_get_posts_admin() {
+		set_current_screen( 'dashboard-user' );
+
+		$wp_query = new WP_Query( 'post_type=post' );
+
+		Post_Glue::pre_get_posts( $wp_query );
+
+		$this->assertEmpty( $wp_query->get( 'orderby' ),
+			'Do not change the query instance when in the admin.' );
 	}
 
 	/**

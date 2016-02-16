@@ -67,3 +67,12 @@ checks:
 
 tools:
     external_code_coverage: false
+
+build:
+    tests:
+        override:
+            -
+                command: 'phpunit --coverage-clover=coverage.xml'
+                coverage:
+                    file: 'coverage.xml'
+                    format: 'php-clover'

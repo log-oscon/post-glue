@@ -11,4 +11,9 @@
       <directory prefix="test-" suffix=".php">./tests/</directory>
     </testsuite>
   </testsuites>
+  <filter>
+    <whitelist processUncoveredFilesFromWhitelist="false">
+      <file>post-glue.php</file>
+    </whitelist>
+  </filter>
 </phpunit>

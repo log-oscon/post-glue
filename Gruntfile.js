@@ -5,6 +5,7 @@ module.exports = function (grunt) {
   var distFiles =  [
     '**',
     '!**/.*',
+    '!**/*.log',
     '!apigen.neon',
     '!assets/**',
     '!bin/**',

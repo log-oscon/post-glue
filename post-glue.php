@@ -123,6 +123,7 @@ class Post_Glue {
 				'Sticky <span class="count">(%s)</span>',
 				'Sticky <span class="count">(%s)</span>',
 				$sticky_posts_count,
+				'sticky view link',
 				'post-glue'
 			),
 			number_format_i18n( $sticky_posts_count )

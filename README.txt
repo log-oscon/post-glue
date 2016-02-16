@@ -18,6 +18,7 @@ This plugin addresses the following issues and limitations found in the core's i
 * Only the core `post` type supports this feature.
 * Sticky posts are added in front of your homepage's results, yielding more posts than the configured per-page setting.
 * Sticky posts reappear as you navigate further into the archive.
+* Sticky posts are prepended to your results when querying specific posts with `post__in`.
 * Difficult to include sticky posts in custom queries.
 
 Some of these issues cause strange behaviour (like when using the REST API) and complicate the creation of custom homepage layouts.

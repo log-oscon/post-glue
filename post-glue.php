@@ -183,6 +183,11 @@ class Post_Glue {
 			return;
 		}
 
+		// Ignore when querying specific posts:
+		if ( $query->get( 'post__in' ) ) {
+			return;
+		}
+
 		// Ignore queries that already provide an order:
 		if ( $query->get( 'orderby' ) ) {
 			return;

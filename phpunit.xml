@@ -8,12 +8,12 @@
   >
   <testsuites>
     <testsuite>
-      <directory prefix="test-" suffix=".php">./tests/</directory>
+      <directory prefix="test-" suffix=".php">tests/</directory>
     </testsuite>
   </testsuites>
   <filter>
     <whitelist processUncoveredFilesFromWhitelist="false">
-      <file>post-glue.php</file>
+      <directory>lib/</directory>
     </whitelist>
   </filter>
 </phpunit>
